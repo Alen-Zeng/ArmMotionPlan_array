@@ -87,7 +87,7 @@ public:
     MotionControllerClassdef(double* _MotorJointSpeedRatios);
     ~MotionControllerClassdef(){};
 
-    void ReceiveTracjectory(double** _JointsPosition,double** _JointsVelocity,double* _TimefromStart,int _PointNum);
+    void ReceiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _TimefromStart,int _PointNum);
     void Interpolation();
     void ChaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size);
     void PrintInterCoe();

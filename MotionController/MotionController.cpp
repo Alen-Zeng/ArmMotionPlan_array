@@ -99,7 +99,7 @@ MotionControllerClassdef::MotionControllerClassdef(double* _MotorJointSpeedRatio
  * @param _JointsAcceleration 所有关节目标加速度
  * @param _TimefromStart 所有轨迹点到达时间
  */
-void MotionControllerClassdef::ReceiveTracjectory(double** _JointsPosition,double** _JointsVelocity,double* _TimefromStart,int _PointNum) 
+void MotionControllerClassdef::ReceiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _TimefromStart,int _PointNum) 
 {
   /* 记录轨迹点数量 */
   PointNum = _PointNum;
