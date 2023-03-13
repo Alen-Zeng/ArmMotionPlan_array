@@ -225,32 +225,32 @@ void MotionControllerClassdef::PrintInterCoe()
  * @param JointNO 哪一个关节
  * @param CoeNO 哪一项系数
  */
-void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,double* Datapool)
-{
-  if(0<=JointNO && JointNO<JointAmount && 1<= CoeNO && CoeNO<=4)
-  {
-    for(int i = 0;i<PointNum-1;i++)
-    {
-      switch (CoeNO)
-      {
-      case 1:
-        Datapool[i] = JointInterCoe[JointNO].FirstCoe[i];
-        break;
-      case 2:
-        Datapool[i] = JointInterCoe[JointNO].SecCoe[i];
-        break;
-      case 3:
-        Datapool[i] = JointInterCoe[JointNO].ThirdCoe[i];
-        break;
-      case 4:
-        Datapool[i] = JointInterCoe[JointNO].FourthCoe[i];
-        break;
+// void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,double* Datapool)
+// {
+//   if(0<=JointNO && JointNO<JointAmount && 1<= CoeNO && CoeNO<=4)
+//   {
+//     for(int i = 0;i<PointNum-1;i++)
+//     {
+//       switch (CoeNO)
+//       {
+//       case 1:
+//         Datapool[i] = JointInterCoe[JointNO].FirstCoe[i];
+//         break;
+//       case 2:
+//         Datapool[i] = JointInterCoe[JointNO].SecCoe[i];
+//         break;
+//       case 3:
+//         Datapool[i] = JointInterCoe[JointNO].ThirdCoe[i];
+//         break;
+//       case 4:
+//         Datapool[i] = JointInterCoe[JointNO].FourthCoe[i];
+//         break;
       
-      default:
-        break;
-      }
-    }
-  }
-}
+//       default:
+//         break;
+//       }
+//     }
+//   }
+// }
 
 /************************ COPYRIGHT(C) SCUT-ROBOTLAB **************************/

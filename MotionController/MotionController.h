@@ -68,7 +68,6 @@ private:
     int PointNum;                        //轨迹点数量
     JointDataPackStructdef JointDataPack[JointAmount];                  //每一个关节的数据
     double TimefromStart[MaxPointAmount];      //到达每个轨迹点的时间点
-    InterpolaCoeStructdef JointInterCoe[JointAmount];                  //每个时间点的各个电机的三次插值化简式系数
 
     /* 三次样条插值中间变量 */
     double Hk[MaxPointAmount-1];               //使用时间间隔进行计算
@@ -83,6 +82,8 @@ private:
     /* 三次样条关键系数,（参见石瑞民数值计算page99） */
     double Mk[MaxPointAmount];
 public:
+    InterpolaCoeStructdef JointInterCoe[JointAmount];                  //每个时间点的各个电机的三次插值化简式系数
+
     MotionControllerClassdef();
     MotionControllerClassdef(double* _MotorJointSpeedRatios);
     ~MotionControllerClassdef(){};
@@ -91,7 +92,7 @@ public:
     void Interpolation();
     void ChaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size);
     void PrintInterCoe();
-    void GetCoe(int JointNO,int CoeNO,double* Datapool);
+    // void GetCoe(int JointNO,int CoeNO,double* Datapool);
 };
 
 
