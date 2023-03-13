@@ -74,7 +74,7 @@ MotionControllerClassdef::MotionControllerClassdef()
  * 
  * @param _MotorJointSpeedRatios 一系列电机关节速度比
  */
-MotionControllerClassdef::MotionControllerClassdef(float* _MotorJointSpeedRatios)
+MotionControllerClassdef::MotionControllerClassdef(double* _MotorJointSpeedRatios)
 {
   /* 存入电机关节速度比 */
   for(int i = 0;i<JointAmount;i++)
@@ -99,7 +99,7 @@ MotionControllerClassdef::MotionControllerClassdef(float* _MotorJointSpeedRatios
  * @param _JointsAcceleration 所有关节目标加速度
  * @param _TimefromStart 所有轨迹点到达时间
  */
-void MotionControllerClassdef::ReceiveTracjectory(float** _JointsPosition,float** _JointsVelocity,float* _TimefromStart,int _PointNum) 
+void MotionControllerClassdef::ReceiveTracjectory(double** _JointsPosition,double** _JointsVelocity,double* _TimefromStart,int _PointNum) 
 {
   /* 记录轨迹点数量 */
   PointNum = _PointNum;
@@ -181,7 +181,7 @@ void MotionControllerClassdef::Interpolation()
  * @param xk 待求解的值
  * @param dk 常数项
  */
-void MotionControllerClassdef::ChaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size)
+void MotionControllerClassdef::ChaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size)
 {
     /* 开始追赶计算 */
     qk[0] = bk[0];
@@ -225,7 +225,7 @@ void MotionControllerClassdef::PrintInterCoe()
  * @param JointNO 哪一个关节
  * @param CoeNO 哪一项系数
  */
-void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,float* Datapool)
+void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,double* Datapool)
 {
   if(0<=JointNO && JointNO<JointAmount && 1<= CoeNO && CoeNO<=4)
   {

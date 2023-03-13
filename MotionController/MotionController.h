@@ -38,9 +38,9 @@
  */
 typedef struct _JointDataPackStructdef
 {
-    float JointPosition[MaxPointAmount];          //关节位置
-    float JointVelocity[MaxPointAmount];          //关节速度，与位置一一对应
-    float MotorJointSpeedRatio;    //电机关节速度比（电机转速与关节速度的比值，需要考虑机械结构和减速箱减速比）
+    double JointPosition[MaxPointAmount];          //关节位置
+    double JointVelocity[MaxPointAmount];          //关节速度，与位置一一对应
+    double MotorJointSpeedRatio;    //电机关节速度比（电机转速与关节速度的比值，需要考虑机械结构和减速箱减速比）
 }JointDataPackStructdef;
 
 
@@ -50,10 +50,10 @@ typedef struct _JointDataPackStructdef
  */
 typedef struct _InterpolaCoeStructdef
 {
-    float FirstCoe[MaxPointAmount-1];       //第一项系数
-    float SecCoe[MaxPointAmount-1];         //第二项系数
-    float ThirdCoe[MaxPointAmount-1];       //第三项系数
-    float FourthCoe[MaxPointAmount-1];      //第四项系数
+    double FirstCoe[MaxPointAmount-1];       //第一项系数
+    double SecCoe[MaxPointAmount-1];         //第二项系数
+    double ThirdCoe[MaxPointAmount-1];       //第三项系数
+    double FourthCoe[MaxPointAmount-1];      //第四项系数
 }InterpolaCoeStructdef;
 
 
@@ -67,31 +67,31 @@ private:
     /* data */
     int PointNum;                        //轨迹点数量
     JointDataPackStructdef JointDataPack[JointAmount];                  //每一个关节的数据
-    float TimefromStart[MaxPointAmount];      //到达每个轨迹点的时间点
+    double TimefromStart[MaxPointAmount];      //到达每个轨迹点的时间点
     InterpolaCoeStructdef JointInterCoe[JointAmount];                  //每个时间点的各个电机的三次插值化简式系数
 
     /* 三次样条插值中间变量 */
-    float Hk[MaxPointAmount-1];               //使用时间间隔进行计算
-    float Uk[MaxPointAmount-1];
-    float LAMBDAk[MaxPointAmount-1];
-    float Dk[MaxPointAmount];
-    float Bk[MaxPointAmount];               //三次样条插值的情形I，对角线全为2
+    double Hk[MaxPointAmount-1];               //使用时间间隔进行计算
+    double Uk[MaxPointAmount-1];
+    double LAMBDAk[MaxPointAmount-1];
+    double Dk[MaxPointAmount];
+    double Bk[MaxPointAmount];               //三次样条插值的情形I，对角线全为2
     /* 追赶法中间变量 */
-    float pk[MaxPointAmount-1];
-    float qk[MaxPointAmount];
-    float yk[MaxPointAmount];
+    double pk[MaxPointAmount-1];
+    double qk[MaxPointAmount];
+    double yk[MaxPointAmount];
     /* 三次样条关键系数,（参见石瑞民数值计算page99） */
-    float Mk[MaxPointAmount];
+    double Mk[MaxPointAmount];
 public:
     MotionControllerClassdef();
-    MotionControllerClassdef(float* _MotorJointSpeedRatios);
+    MotionControllerClassdef(double* _MotorJointSpeedRatios);
     ~MotionControllerClassdef(){};
 
-    void ReceiveTracjectory(float** _JointsPosition,float** _JointsVelocity,float* _TimefromStart,int _PointNum);
+    void ReceiveTracjectory(double** _JointsPosition,double** _JointsVelocity,double* _TimefromStart,int _PointNum);
     void Interpolation();
-    void ChaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
+    void ChaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size);
     void PrintInterCoe();
-    void GetCoe(int JointNO,int CoeNO,float* Datapool);
+    void GetCoe(int JointNO,int CoeNO,double* Datapool);
 };
 
 
