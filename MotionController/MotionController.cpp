@@ -184,16 +184,6 @@ void MotionControllerClassdef::Interpolation()
  */
 void MotionControllerClassdef::ChaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size)
 {
-    /* 清空中间值vector */
-    if(pk != NULL){vPortFree(pk);}
-    if(qk != NULL){vPortFree(qk);}
-    if(yk != NULL){vPortFree(yk);}
-    /* 申请内存 */
-    pk = (float*)pvPortMalloc((size-1)*sizeof(float));
-    qk = (float*)pvPortMalloc(size*sizeof(float));
-    yk = (float*)pvPortMalloc(size*sizeof(float));
-
-
     /* 开始追赶计算 */
     qk[0] = bk[0];
     for(int i = 1;i< size;i++)
