@@ -38,8 +38,8 @@
  */
 typedef struct _JointDataPackStructdef
 {
-    float[MaxPointAmount] JointPosition;          //关节位置
-    float[MaxPointAmount] JointVelocity;          //关节速度，与位置一一对应
+    float JointPosition[MaxPointAmount];          //关节位置
+    float JointVelocity[MaxPointAmount];          //关节速度，与位置一一对应
     float MotorJointSpeedRatio;    //电机关节速度比（电机转速与关节速度的比值，需要考虑机械结构和减速箱减速比）
 }JointDataPackStructdef;
 
@@ -50,10 +50,10 @@ typedef struct _JointDataPackStructdef
  */
 typedef struct _InterpolaCoeStructdef
 {
-    float[MaxPointAmount-1] FirstCoe;       //第一项系数
-    float[MaxPointAmount-1] SecCoe;         //第二项系数
-    float[MaxPointAmount-1] ThirdCoe;       //第三项系数
-    float[MaxPointAmount-1] FourthCoe;      //第四项系数
+    float FirstCoe[MaxPointAmount-1];       //第一项系数
+    float SecCoe[MaxPointAmount-1];         //第二项系数
+    float ThirdCoe[MaxPointAmount-1];       //第三项系数
+    float FourthCoe[MaxPointAmount-1];      //第四项系数
 }InterpolaCoeStructdef;
 
 
@@ -65,27 +65,26 @@ class MotionControllerClassdef
 {
 private:
     /* data */
-    int JointNum;                        //关节数量
     int PointNum;                        //轨迹点数量
-    JointDataPackStructdef[JointAmount] JointDataPack;                  //每一个关节的数据
-    float[MaxPointAmount] TimefromStart;      //到达每个轨迹点的时间点
-    InterpolaCoeStructdef[JointAmount] JointInterCoe;                  //每个时间点的各个电机的三次插值化简式系数
+    JointDataPackStructdef JointDataPack[JointAmount];                  //每一个关节的数据
+    float TimefromStart[MaxPointAmount];      //到达每个轨迹点的时间点
+    InterpolaCoeStructdef JointInterCoe[JointAmount];                  //每个时间点的各个电机的三次插值化简式系数
 
     /* 三次样条插值中间变量 */
-    float[MaxPointAmount-1] Hk;               //使用时间间隔进行计算
-    float[MaxPointAmount-1] Uk;
-    float[MaxPointAmount-1] LAMBDAk;
-    float[MaxPointAmount] Dk;
-    float[MaxPointAmount] Bk;               //三次样条插值的情形I，对角线全为2
+    float Hk[MaxPointAmount-1];               //使用时间间隔进行计算
+    float Uk[MaxPointAmount-1];
+    float LAMBDAk[MaxPointAmount-1];
+    float Dk[MaxPointAmount];
+    float Bk[MaxPointAmount];               //三次样条插值的情形I，对角线全为2
     /* 追赶法中间变量 */
-    float[MaxPointAmount-1] pk;
-    float[MaxPointAmount] qk;
-    float[MaxPointAmount] yk;
+    float pk[MaxPointAmount-1];
+    float qk[MaxPointAmount];
+    float yk[MaxPointAmount];
     /* 三次样条关键系数,（参见石瑞民数值计算page99） */
-    float[MaxPointAmount] Mk;
+    float Mk[MaxPointAmount];
 public:
-    MotionControllerClassdef(int _JointNum);
-    MotionControllerClassdef(int _JointNum,float* _MotorJointSpeedRatios);
+    MotionControllerClassdef();
+    MotionControllerClassdef(float* _MotorJointSpeedRatios);
     ~MotionControllerClassdef(){};
 
     void ReceiveTracjectory(float** _JointsPosition,float** _JointsVelocity,float* _TimefromStart,int _PointNum);

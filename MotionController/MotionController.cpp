@@ -58,37 +58,37 @@
 /**
  * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
  * 
- * @param _JointNum 关节数量
  */
-MotionControllerClassdef::MotionControllerClassdef(int _JointNum)
+MotionControllerClassdef::MotionControllerClassdef()
 {
-  JointDataPack = (JointDataPackStructdef*)pvPortMalloc(_JointNum*sizeof(JointDataPackStructdef));
-  JointInterCoe = (InterpolaCoeStructdef*)pvPortMalloc(_JointNum*sizeof(InterpolaCoeStructdef));
-  /* 初始化关节数量 */
-  JointNum = _JointNum;
   /* 初始化轨迹点数量为0 */
   PointNum = 0;
+  /* 把对角线全部设置为2 */
+  for(int i = 0;i<MaxPointAmount;i++)
+  {
+    Bk[i] = 2;
+  }
 }
 
 /**
  * @brief Construct a new MotionControllerClassdef:: MotionControllerClassdef object
  * 
- * @param _JointNum 关节数量
  * @param _MotorJointSpeedRatios 一系列电机关节速度比
  */
-MotionControllerClassdef::MotionControllerClassdef(int _JointNum,float* _MotorJointSpeedRatios)
+MotionControllerClassdef::MotionControllerClassdef(float* _MotorJointSpeedRatios)
 {
-  JointDataPack = (JointDataPackStructdef*)pvPortMalloc(_JointNum*sizeof(JointDataPackStructdef));
-  JointInterCoe = (InterpolaCoeStructdef*)pvPortMalloc(_JointNum*sizeof(InterpolaCoeStructdef));
   /* 存入电机关节速度比 */
-  for(int i = 0;i<_JointNum;i++)
+  for(int i = 0;i<JointAmount;i++)
   {
       JointDataPack[i].MotorJointSpeedRatio = _MotorJointSpeedRatios[i];
   }
-  /* 初始化关节数量 */
-  JointNum = _JointNum;
   /* 初始化轨迹点数量为0 */
   PointNum = 0;
+  /* 把对角线全部设置为2 */
+  for(int i = 0;i<MaxPointAmount;i++)
+  {
+    Bk[i] = 2;
+  }
 }
 
 
@@ -105,28 +105,9 @@ void MotionControllerClassdef::ReceiveTracjectory(float** _JointsPosition,float*
   /* 记录轨迹点数量 */
   PointNum = _PointNum;
 
-  if(TimefromStart != NULL)
-  {
-    /* 清空时间点 */
-    vPortFree(TimefromStart);
-  }
   /* 第i个关节 */
-  for(int i = 0;i<JointNum;i++)
+  for(int i = 0;i<JointAmount;i++)
   {
-    /* 清空轨迹点 */
-    if(JointDataPack[i].JointPosition != NULL)
-    {
-      vPortFree(JointDataPack[i].JointPosition);
-    }
-    if(JointDataPack[i].JointVelocity != NULL)
-    {
-      vPortFree(JointDataPack[i].JointVelocity);
-    }
-
-    /* 申请内存分配 */
-    JointDataPack[i].JointPosition = (float *)pvPortMalloc(PointNum*sizeof(float));
-    JointDataPack[i].JointVelocity = (float *)pvPortMalloc(PointNum*sizeof(float));
-    TimefromStart = (float *)pvPortMalloc(PointNum*sizeof(float));
 
     for(int j = 0;j<PointNum;j++)
     {
@@ -141,20 +122,6 @@ void MotionControllerClassdef::ReceiveTracjectory(float** _JointsPosition,float*
   {
     TimefromStart[i] = _TimefromStart[i];
   }
-
-  /* 给Bk申请内存 */
-  if(Bk == NULL)
-  {
-    Bk = (float*)pvPortMalloc(PointNum*sizeof(float));
-  }
-  /* 把对角线全部设置为2 */
-  else
-  {
-    for(int i = 0;i<PointNum;i++)
-    {
-      Bk[i] = 2;
-    }
-  }
 }
 
 
@@ -165,8 +132,6 @@ void MotionControllerClassdef::ReceiveTracjectory(float** _JointsPosition,float*
 void MotionControllerClassdef::Interpolation() 
 {
   /* 计算时间间隔Hk */
-    if(Hk != NULL){vPortFree(Hk);}
-    Hk = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
     for(int j = 0;j<PointNum-1;j++)
     {
         /* 第j个时间点，计算时间间隔，最后一个时间点不单独遍历 */
@@ -174,28 +139,8 @@ void MotionControllerClassdef::Interpolation()
     }
 
     /* 第i个关节 */
-    for(int i = 0;i<JointNum;i++)
+    for(int i = 0;i<JointAmount;i++)
     {
-        /* 清空计算结果 */
-        if(JointInterCoe[i].FirstCoe != NULL){vPortFree(JointInterCoe[i].FirstCoe);}
-        if(JointInterCoe[i].SecCoe != NULL){vPortFree(JointInterCoe[i].SecCoe);}
-        if(JointInterCoe[i].ThirdCoe != NULL){vPortFree(JointInterCoe[i].ThirdCoe);}
-        if(JointInterCoe[i].FourthCoe != NULL){vPortFree(JointInterCoe[i].FourthCoe);}
-        /* 清空中间变量 */
-        if(Uk != NULL){vPortFree(Uk);}
-        if(LAMBDAk != NULL){vPortFree(LAMBDAk);}
-        if(Dk != NULL){vPortFree(Dk);}
-        if(Mk != NULL){vPortFree(Mk);}
-        /* 申请内存 */
-        JointInterCoe[i].FirstCoe = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
-        JointInterCoe[i].SecCoe = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
-        JointInterCoe[i].ThirdCoe = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
-        JointInterCoe[i].FourthCoe = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
-        Uk = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
-        LAMBDAk = (float*)pvPortMalloc((PointNum-1)*sizeof(float));
-        Dk = (float*)pvPortMalloc(PointNum*sizeof(float));
-        Mk = (float*)pvPortMalloc(PointNum*sizeof(float));
-
         /* d0的计算 */
         Dk[0] = 6*((JointDataPack[i].JointPosition[1]-JointDataPack[i].JointPosition[0])/(TimefromStart[1]-TimefromStart[0]) - JointDataPack[i].JointVelocity[0])/Hk[0];
         /* 把lambdak的第一个加入为1，方便追赶法计算 */
@@ -293,7 +238,7 @@ void MotionControllerClassdef::PrintInterCoe()
  */
 void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,float* Datapool)
 {
-  if(0<=JointNO && JointNO<JointNum && 1<= CoeNO && CoeNO<=4)
+  if(0<=JointNO && JointNO<JointAmount && 1<= CoeNO && CoeNO<=4)
   {
     for(int i = 0;i<PointNum-1;i++)
     {
