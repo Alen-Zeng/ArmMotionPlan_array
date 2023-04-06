@@ -23,12 +23,6 @@
 /* Private macros ------------------------------------------------------------*/
 #define MaxPointAmount 100    //轨迹点最大数量
 #define JointAmount 6         //关节数量
-/* Private type --------------------------------------------------------------*/
-
-/* Exported macros -----------------------------------------------------------*/
-
-/* Exported function declarations --------------------------------------------*/
-
 /* Exported types ------------------------------------------------------------*/
 
 /**
@@ -91,8 +85,6 @@ public:
     void PrintInterCoe();
     // void GetCoe(int JointNO,int CoeNO,double* Datapool);
 };
-
-
 
 
 /************************ COPYRIGHT(C) SCUT-ROBOTLAB **************************/

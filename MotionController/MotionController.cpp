@@ -44,16 +44,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "MotionController.h"
 #include <math.h>
-/* Private define ------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Private type --------------------------------------------------------------*/
-
-/* Private function declarations ---------------------------------------------*/
-
 /* function prototypes -------------------------------------------------------*/
-
 
 /**
  * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
