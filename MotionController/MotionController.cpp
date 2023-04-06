@@ -70,27 +70,6 @@ MotionControllerClassdef::MotionControllerClassdef()
   }
 }
 
-/**
- * @brief Construct a new MotionControllerClassdef:: MotionControllerClassdef object
- * 
- * @param _MotorJointSpeedRatios 一系列电机关节速度比
- */
-MotionControllerClassdef::MotionControllerClassdef(double* _MotorJointSpeedRatios)
-{
-  /* 存入电机关节速度比 */
-  for(int i = 0;i<JointAmount;i++)
-  {
-      JointDataPack[i].MotorJointSpeedRatio = _MotorJointSpeedRatios[i];
-  }
-  /* 初始化轨迹点数量为0 */
-  PointNum = 0;
-  /* 把对角线全部设置为2 */
-  for(int i = 0;i<MaxPointAmount;i++)
-  {
-    Bk[i] = 2;
-  }
-}
-
 
 /**
  * @brief 接收并更新离散关节位置、各位置目标速度、各位置目标加速度和到达各轨迹点的时间点

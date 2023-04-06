@@ -40,7 +40,6 @@ typedef struct _JointDataPackStructdef
 {
     double JointPosition[MaxPointAmount];          //关节位置
     double JointVelocity[MaxPointAmount];          //关节速度，与位置一一对应
-    double MotorJointSpeedRatio;    //电机关节速度比（电机转速与关节速度的比值，需要考虑机械结构和减速箱减速比）
 }JointDataPackStructdef;
 
 
@@ -65,12 +64,8 @@ class MotionControllerClassdef
 {
 private:
     /* data */
-    int PointNum;                        //轨迹点数量
-    JointDataPackStructdef JointDataPack[JointAmount];                  //每一个关节的数据
-    double TimefromStart[MaxPointAmount];      //到达每个轨迹点的时间点
-
     /* 三次样条插值中间变量 */
-    double Hk[MaxPointAmount-1];               //使用时间间隔进行计算
+    double Hk[MaxPointAmount-1];             //使用时间间隔进行计算
     double Uk[MaxPointAmount-1];
     double LAMBDAk[MaxPointAmount-1];
     double Dk[MaxPointAmount];
@@ -82,10 +77,12 @@ private:
     /* 三次样条关键系数,（参见石瑞民数值计算page99） */
     double Mk[MaxPointAmount];
 public:
-    InterpolaCoeStructdef JointInterCoe[JointAmount];                  //每个时间点的各个电机的三次插值化简式系数
+    int PointNum;                                         //轨迹点数量
+    JointDataPackStructdef JointDataPack[JointAmount];    //每一个关节的数据
+    double TimefromStart[MaxPointAmount];                 //到达每个轨迹点的时间点
+    InterpolaCoeStructdef JointInterCoe[JointAmount];     //每个时间点的各个电机的三次插值化简式系数
 
     MotionControllerClassdef();
-    MotionControllerClassdef(double* _MotorJointSpeedRatios);
     ~MotionControllerClassdef(){};
 
     void ReceiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _TimefromStart,int _PointNum);
