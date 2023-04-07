@@ -52,8 +52,27 @@
  */
 MotionControllerClassdef::MotionControllerClassdef()
 {
-  /* TODO添加关节目标设置函数 */
+  /* 初始化轨迹点数量为0 */
+  pointNum = 0;
+  /* 把对角线全部设置为2 */
+  for(int i = 0;i<MaxPointAmount;i++)
+  {
+    Bk[i] = 2;
+  }
+}
 
+/**
+ * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
+ * 
+ * @tparam JointType 关节类型
+ * @param Joints 
+ */
+template <class... JointType>
+MotionControllerClassdef::MotionControllerClassdef(JointType... Joints)
+{
+  int jointNum = 0;
+  /* 添加关节目标设置函数 */
+  int array[] = {(setTargetFunc[jointNum] = Joints, jointNum++)...};
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
   /* 把对角线全部设置为2 */
@@ -181,9 +200,9 @@ void MotionControllerClassdef::chaseLUFactorization(double* bk,double* ak,double
  * @brief 设置关节目标
  * 
  */
-void MotionControllerClassdef::setJointTarget()
+void MotionControllerClassdef::JointControl()
 {
-  
+
 }
 
 
