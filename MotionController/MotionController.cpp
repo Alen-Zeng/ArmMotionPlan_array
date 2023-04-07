@@ -65,14 +65,14 @@ MotionControllerClassdef::MotionControllerClassdef()
  * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
  * 
  * @tparam JointType 关节类型
- * @param Joints 
+ * @param _jointTargetFuncs 
  */
 template <class... JointType>
-MotionControllerClassdef::MotionControllerClassdef(JointType... Joints)
+MotionControllerClassdef::MotionControllerClassdef(JointType... _jointTargetFuncs)
 {
-  int jointNum = 0;
   /* 添加关节目标设置函数 */
-  int array[] = {(setTargetFunc[jointNum] = Joints, jointNum++)...};
+  int funcNO = 0;
+  int array[] = {(setTargetFunc[funcNO] = _jointTargetFuncs, funcNO++)...};
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
   /* 把对角线全部设置为2 */
@@ -193,6 +193,20 @@ void MotionControllerClassdef::chaseLUFactorization(double* bk,double* ak,double
         /* 因为求解是倒序的，所以要从头部插入 */
         xk[i] = (yk[i]-ck[i]*xk[i+1])/qk[i];
     }
+}
+
+
+/**
+ * @brief 设置关节速度限制（必须）
+ * 
+ * @tparam Limittype 
+ * @param _limits 必须是float*类型，否则出错
+ */
+template <class... Limittype>
+void MotionControllerClassdef::setJointSpeedLimit(const Limittype*... _limits)
+{
+  int limitNO = 0;
+  int array[] = {(jointSpeedLimit[limitNO] = _limits, limitNO++)...};
 }
 
 
