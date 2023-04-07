@@ -53,7 +53,7 @@
 MotionControllerClassdef::MotionControllerClassdef()
 {
   /* 初始化轨迹点数量为0 */
-  PointNum = 0;
+  pointNum = 0;
   /* 把对角线全部设置为2 */
   for(int i = 0;i<MaxPointAmount;i++)
   {
@@ -68,29 +68,29 @@ MotionControllerClassdef::MotionControllerClassdef()
  * @param _JointsPosition 所有关节位置
  * @param _JointsVelocity 所有关节目标速度
  * @param _JointsAcceleration 所有关节目标加速度
- * @param _TimefromStart 所有轨迹点到达时间
+ * @param _timefromStart 所有轨迹点到达时间
  */
-void MotionControllerClassdef::ReceiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _TimefromStart,int _PointNum) 
+void MotionControllerClassdef::receiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _timefromStart,int _pointNum) 
 {
   /* 记录轨迹点数量 */
-  PointNum = _PointNum;
+  pointNum = _pointNum;
 
   /* 第i个关节 */
   for(int i = 0;i<JointAmount;i++)
   {
 
-    for(int j = 0;j<PointNum;j++)
+    for(int j = 0;j<pointNum;j++)
     {
       /* 第j个轨迹点的关节位置 */
-      JointDataPack[i].JointPosition[j] = _JointsPosition[i][j];
+      jointDataPack[i].JointPosition[j] = _JointsPosition[i][j];
       /* 第j个轨迹点的关节目标速度 */
-      JointDataPack[i].JointVelocity[j] = _JointsVelocity[i][j];
+      jointDataPack[i].JointVelocity[j] = _JointsVelocity[i][j];
     }
   }
   /* 第j个轨迹点的到达时间 */
-  for(int i = 0;i<PointNum;i++)
+  for(int i = 0;i<pointNum;i++)
   {
-    TimefromStart[i] = _TimefromStart[i];
+    timefromStart[i] = _timefromStart[i];
   }
 }
 
@@ -99,45 +99,45 @@ void MotionControllerClassdef::ReceiveTracjectory(double _JointsPosition[JointAm
  * @brief 三次样条插值系数计算
  * @note 每两个轨迹点之间都进行计算
  */
-void MotionControllerClassdef::Interpolation() 
+void MotionControllerClassdef::interpolation() 
 {
   /* 计算时间间隔Hk */
-    for(int j = 0;j<PointNum-1;j++)
+    for(int j = 0;j<pointNum-1;j++)
     {
         /* 第j个时间点，计算时间间隔，最后一个时间点不单独遍历 */
-        Hk[j] = TimefromStart[j+1]-TimefromStart[j];
+        Hk[j] = timefromStart[j+1]-timefromStart[j];
     }
 
     /* 第i个关节 */
     for(int i = 0;i<JointAmount;i++)
     {
         /* d0的计算 */
-        Dk[0] = 6*((JointDataPack[i].JointPosition[1]-JointDataPack[i].JointPosition[0])/(TimefromStart[1]-TimefromStart[0]) - JointDataPack[i].JointVelocity[0])/Hk[0];
+        Dk[0] = 6*((jointDataPack[i].JointPosition[1]-jointDataPack[i].JointPosition[0])/(timefromStart[1]-timefromStart[0]) - jointDataPack[i].JointVelocity[0])/Hk[0];
         /* 把lambdak的第一个加入为1，方便追赶法计算 */
         LAMBDAk[0] = 1;
-        for(int j = 1;j<PointNum-1;j++)
+        for(int j = 1;j<pointNum-1;j++)
         {
             /* 第j个uk，lambdak,dk,k从1到n-1 */
             Uk[j-1] = Hk[j-1]/(Hk[j-1] +Hk[j]);
             LAMBDAk[j] = 1-Uk[j-1];
-            Dk[j] = 6*((JointDataPack[i].JointPosition[j+1] - JointDataPack[i].JointPosition[j])/(TimefromStart[j+1]-TimefromStart[j]) - (JointDataPack[i].JointPosition[j] - JointDataPack[i].JointPosition[j-1])/(TimefromStart[j] - TimefromStart[j-1]))/(TimefromStart[j+1] - TimefromStart[j-1]);
+            Dk[j] = 6*((jointDataPack[i].JointPosition[j+1] - jointDataPack[i].JointPosition[j])/(timefromStart[j+1]-timefromStart[j]) - (jointDataPack[i].JointPosition[j] - jointDataPack[i].JointPosition[j-1])/(timefromStart[j] - timefromStart[j-1]))/(timefromStart[j+1] - timefromStart[j-1]);
         }
         /* 把uk的最后一个加入为1，方便追赶法计算 */
-        Uk[PointNum-2] = 1;
+        Uk[pointNum-2] = 1;
         /* dn的计算 */
-        Dk[PointNum-1] = 6 * (JointDataPack[i].JointVelocity[PointNum - 1] - (JointDataPack[i].JointPosition[PointNum - 1] - JointDataPack[i].JointPosition[PointNum - 2]) / (TimefromStart[PointNum - 1] - TimefromStart[PointNum - 2])) / (Hk[PointNum - 2]);
+        Dk[pointNum-1] = 6 * (jointDataPack[i].JointVelocity[pointNum - 1] - (jointDataPack[i].JointPosition[pointNum - 1] - jointDataPack[i].JointPosition[pointNum - 2]) / (timefromStart[pointNum - 1] - timefromStart[pointNum - 2])) / (Hk[pointNum - 2]);
 
         /* 求解Mk */
-        ChaseLUFactorization(Bk,Uk,LAMBDAk,Mk,Dk,PointNum);
+        chaseLUFactorization(Bk,Uk,LAMBDAk,Mk,Dk,pointNum);
 
         /* 通过Mk计算系数 */
-        for(int j = 0;j<PointNum-1;j++)
+        for(int j = 0;j<pointNum-1;j++)
         {
             /* 各项系数计算 */
-            JointInterCoe[i].FirstCoe[j] = Mk[j]/(6*Hk[j]);
-            JointInterCoe[i].SecCoe[j] = Mk[j+1]/(6*Hk[j]);
-            JointInterCoe[i].ThirdCoe[j] = (JointDataPack[i].JointPosition[j] - Mk[j]*pow(Hk[j],2)/(6))/Hk[j];
-            JointInterCoe[i].FourthCoe[j] = (JointDataPack[i].JointPosition[j+1]/Hk[j] - Mk[j+1]*Hk[j]/6);
+            jointInterCoe[i].FirstCoe[j] = Mk[j]/(6*Hk[j]);
+            jointInterCoe[i].SecCoe[j] = Mk[j+1]/(6*Hk[j]);
+            jointInterCoe[i].ThirdCoe[j] = (jointDataPack[i].JointPosition[j] - Mk[j]*pow(Hk[j],2)/(6))/Hk[j];
+            jointInterCoe[i].FourthCoe[j] = (jointDataPack[i].JointPosition[j+1]/Hk[j] - Mk[j+1]*Hk[j]/6);
         }
     }
 }
@@ -152,7 +152,7 @@ void MotionControllerClassdef::Interpolation()
  * @param xk 待求解的值
  * @param dk 常数项
  */
-void MotionControllerClassdef::ChaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size)
+void MotionControllerClassdef::chaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size)
 {
     /* 开始追赶计算 */
     qk[0] = bk[0];
@@ -179,12 +179,12 @@ void MotionControllerClassdef::ChaseLUFactorization(double* bk,double* ak,double
  * @brief 打印系数
  * 
  */
-void MotionControllerClassdef::PrintInterCoe()
+void MotionControllerClassdef::printInterCoe()
 {
-  // for(int i = 0;i<JointInterCoe.Time.size();i++)
+  // for(int i = 0;i<jointInterCoe.Time.size();i++)
   // {
   //   std::cout<<"M"<<i<<":"<<Mk.at(i)<<"  ";
-  //   std::cout<<JointInterCoe.InterpolaCoe.at(0).FirstCoe.at(i)<<"*("<<TimefromStart.at(i+1)<<"-x)^3+"<<JointInterCoe.InterpolaCoe.at(0).SecCoe.at(i)<<"*(x-"<<TimefromStart.at(i)<<")^3+"<<JointInterCoe.InterpolaCoe.at(0).ThirdCoe.at(i)<<"*("<<TimefromStart.at(i+1)<<"-x)+"<<JointInterCoe.InterpolaCoe.at(0).FourthCoe.at(i)<<"*(x-"<<TimefromStart.at(i)<<")"<<std::endl;
+  //   std::cout<<jointInterCoe.InterpolaCoe.at(0).FirstCoe.at(i)<<"*("<<timefromStart.at(i+1)<<"-x)^3+"<<jointInterCoe.InterpolaCoe.at(0).SecCoe.at(i)<<"*(x-"<<timefromStart.at(i)<<")^3+"<<jointInterCoe.InterpolaCoe.at(0).ThirdCoe.at(i)<<"*("<<timefromStart.at(i+1)<<"-x)+"<<jointInterCoe.InterpolaCoe.at(0).FourthCoe.at(i)<<"*(x-"<<timefromStart.at(i)<<")"<<std::endl;
   // }
   // std::cout<<"Mn:"<<Mk.back()<<std::endl;
 }
@@ -200,21 +200,21 @@ void MotionControllerClassdef::PrintInterCoe()
 // {
 //   if(0<=JointNO && JointNO<JointAmount && 1<= CoeNO && CoeNO<=4)
 //   {
-//     for(int i = 0;i<PointNum-1;i++)
+//     for(int i = 0;i<pointNum-1;i++)
 //     {
 //       switch (CoeNO)
 //       {
 //       case 1:
-//         Datapool[i] = JointInterCoe[JointNO].FirstCoe[i];
+//         Datapool[i] = jointInterCoe[JointNO].FirstCoe[i];
 //         break;
 //       case 2:
-//         Datapool[i] = JointInterCoe[JointNO].SecCoe[i];
+//         Datapool[i] = jointInterCoe[JointNO].SecCoe[i];
 //         break;
 //       case 3:
-//         Datapool[i] = JointInterCoe[JointNO].ThirdCoe[i];
+//         Datapool[i] = jointInterCoe[JointNO].ThirdCoe[i];
 //         break;
 //       case 4:
-//         Datapool[i] = JointInterCoe[JointNO].FourthCoe[i];
+//         Datapool[i] = jointInterCoe[JointNO].FourthCoe[i];
 //         break;
       
 //       default:
