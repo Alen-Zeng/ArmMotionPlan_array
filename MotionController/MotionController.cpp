@@ -64,15 +64,10 @@ MotionControllerClassdef::MotionControllerClassdef()
 /**
  * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
  * 
- * @tparam JointType 关节类型
- * @param _jointTargetFuncs 
+ * @param _jointTarget 外部关节目标数组
  */
-template <class... JointType>
-MotionControllerClassdef::MotionControllerClassdef(JointType... _jointTargetFuncs)
+MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget):jointTargetptr(_jointTarget)
 {
-  /* 添加关节目标设置函数 */
-  int funcNO = 0;
-  int array[] = {(setTargetFunc[funcNO] = _jointTargetFuncs, funcNO++)...};
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
   /* 把对角线全部设置为2 */
@@ -81,6 +76,7 @@ MotionControllerClassdef::MotionControllerClassdef(JointType... _jointTargetFunc
     Bk[i] = 2;
   }
 }
+
 
 
 /**
@@ -212,11 +208,39 @@ void MotionControllerClassdef::setJointSpeedLimit(const Limittype*... _limits)
 
 /**
  * @brief 设置关节目标
- * 
+ * @note 在任务中定时调用
  */
 void MotionControllerClassdef::JointControl()
 {
+  float tempxVariable = 0;
+  // curveNO = 0;
+  // xVariable = timefromStart[0];
+  // deltaX = 0.01;
 
+  if(timefromStart[0] <= xVariable && xVariable < timefromStart[pointNum -1])
+  {
+    tempxVariable = xVariable + deltaX;
+    if(tempxVariable > timefromStart[pointNum-1])     //自变量超过末值
+    {
+      deltaX = timefromStart[pointNum-1]-xVariable;
+      tempxVariable = timefromStart[pointNum-1];
+    }
+    else if()   //某关节超限速
+    {
+
+    }
+    else if(tempxVariable > timefromStart[curveNO+1]) //跳转到下一条曲线
+    {
+      curveNO++;
+    }
+  }
+  // else if()   //关节超限速
+
+  /* 设置目标值 第i个关节 */
+  for(int i = 0;i<JointAmount;i++)
+  {
+    jointTargetptr[i] = (float)(jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
+  }
 }
 
 
