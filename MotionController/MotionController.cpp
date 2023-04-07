@@ -52,6 +52,8 @@
  */
 MotionControllerClassdef::MotionControllerClassdef()
 {
+  /* TODO添加关节目标设置函数 */
+
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
   /* 把对角线全部设置为2 */
@@ -172,6 +174,16 @@ void MotionControllerClassdef::chaseLUFactorization(double* bk,double* ak,double
         /* 因为求解是倒序的，所以要从头部插入 */
         xk[i] = (yk[i]-ck[i]*xk[i+1])/qk[i];
     }
+}
+
+
+/**
+ * @brief 设置关节目标
+ * 
+ */
+void MotionControllerClassdef::setJointTarget()
+{
+  
 }
 
 

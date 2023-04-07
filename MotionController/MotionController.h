@@ -67,12 +67,14 @@ private:
     /* 三次样条关键系数,（参见石瑞民数值计算page99） */
     double Mk[MaxPointAmount];
 public:
-    int pointNum;                                         //轨迹点数量
-    JointDataPackStructdef jointDataPack[JointAmount];    //每一个关节的数据
-    double timefromStart[MaxPointAmount];                 //到达每个轨迹点的时间点
-    InterpolaCoeStructdef jointInterCoe[JointAmount];     //每个时间点的各个电机的三次插值化简式系数
-    float* jointSpeedLimit[JointAmount];                  //关节速度上限
-    float stepTime;
+    int pointNum;                                             //轨迹点数量
+    JointDataPackStructdef jointDataPack[JointAmount];        //每一个关节的数据
+    double timefromStart[MaxPointAmount];                     //到达每个轨迹点的时间点
+    InterpolaCoeStructdef jointInterCoe[JointAmount];         //每个时间点的各个电机的三次插值化简式系数
+    float* jointSpeedLimit[JointAmount];                      //关节速度上限
+    float deltaTime = 10;                                     //间隔时间
+    float timeVariable = 0;                                   //时间自变量（计算目标值）
+    void (*setTarget[JointAmount])(float _target) = {nullptr};//关节目标设置函数指针数组
 
     MotionControllerClassdef();
     ~MotionControllerClassdef(){};
@@ -80,7 +82,7 @@ public:
     void receiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _timefromStart,int _pointNum);
     void interpolation();
     void chaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size);
-    // void 
+    void setJointTarget();
     void printInterCoe();
     // void GetCoe(int JointNO,int CoeNO,double* Datapool);
 };
