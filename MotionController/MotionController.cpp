@@ -209,7 +209,7 @@ void MotionControllerClassdef::setJointSpeedLimit(Limittype*... _limits)
 /**
  * @brief 根据最小时间间隔计算合适的deltaX
  * @note 防止一次性越过多条曲线的情况
- * @param _deltaX 
+ * @param _deltaX 默认曲线自变量增量
  */
 void MotionControllerClassdef::adjustDeltaX(float& _deltaX)
 {
@@ -261,45 +261,63 @@ bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
 
 
 /**
+ * @brief 关节限速
+ * @note 用比例减小法（乘0.6）查找不超限的自变量 TODO:有没有更好的办法？如何判断超越的幅度？
+ * @param _tempdeltaX 
+ * @param _tempxVariable 
+ */
+void MotionControllerClassdef::limitSpeed(float& _tempdeltaX, float& _tempxVariable)
+{
+  while (judgeSpeedLimit(_tempxVariable))
+  {
+    _tempdeltaX = 0.6*_tempdeltaX;
+    _tempxVariable = xVariable + _tempdeltaX;
+  }
+}
+
+
+/**
  * @brief 设置关节目标
  * @note 在任务中定时调用
  */
 void MotionControllerClassdef::JointControl()
 {
   float tempxVariable = 0;
-  // curveNO = 0;
-  // xVariable = timefromStart[0];
-  // deltaX = 0.01;
 
-  if(interOK && timefromStart[0] <= xVariable && xVariable < timefromStart[pointNum -1])
+  if(interOK && xVariable == 0)  //插值计算但未开始执行
   {
-    tempxVariable = xVariable + deltaX;
+    adjustDeltaX(deltaX); //计算本次默认deltaX
+  }
+  float tempdeltaX = deltaX;
+  if(interOK && timefromStart[0] <= xVariable && xVariable < timefromStart[pointNum -1])  //插值计算完成且正在执行
+  {
+    tempxVariable = xVariable + tempdeltaX;
     if(tempxVariable > timefromStart[pointNum-1])     //自变量超过末值
     {
-      deltaX = timefromStart[pointNum-1]-xVariable;
+      tempdeltaX = timefromStart[pointNum-1]-xVariable;
       tempxVariable = timefromStart[pointNum-1];
+      /* TODO:逻辑 */
+      limitSpeed(tempdeltaX,tempxVariable);
     }
-    else if(true)   //某关节超限速，用比例减小法（乘0.6）查找不超限的自变量 TODO:有没有更好的办法？如何判断超越的幅度？
-    {
-      while (judgeSpeedLimit(tempxVariable))
-      {
-        deltaX = 0.6*deltaX;
-        tempxVariable = xVariable + deltaX;
-      }
-      
-    }
+    /* TODO判断逻辑？ */
     else if(tempxVariable > timefromStart[curveNO+1]) //跳转到下一条曲线
     {
       curveNO++;
     }
+    xVariable = tempxVariable;
+    /* 设置目标值 第i个关节 */
+    for(int i = 0;i<JointAmount;i++)
+    {
+      jointTargetptr[i] = (float)(jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
+    }
+  }
+  else if(interOK && xVariable == timefromStart[pointNum-1])  //插值计算完成且执行完成
+  {
+    curveNO = 0;
+    xVariable = 0;
+    interOK = false;
   }
 
-  xVariable = tempxVariable;
-  /* 设置目标值 第i个关节 */
-  for(int i = 0;i<JointAmount;i++)
-  {
-    jointTargetptr[i] = (float)(jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
-  }
 }
 
 
