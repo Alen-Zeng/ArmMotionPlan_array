@@ -199,10 +199,40 @@ void MotionControllerClassdef::chaseLUFactorization(double* bk,double* ak,double
  * @param _limits 必须是float*类型，否则出错
  */
 template <class... Limittype>
-void MotionControllerClassdef::setJointSpeedLimit(const Limittype*... _limits)
+void MotionControllerClassdef::setJointSpeedLimit(Limittype*... _limits)
 {
   int limitNO = 0;
   int array[] = {(jointSpeedLimit[limitNO] = _limits, limitNO++)...};
+}
+
+
+/**
+ * @brief 根据最小时间间隔计算合适的deltaX
+ * @note 防止一次性越过多条曲线的情况
+ * @param _deltaX 
+ */
+void MotionControllerClassdef::adjustDeltaX(float& _deltaX)
+{
+  _deltaX = (timefromStart[1] - timefromStart[0])/3.0f;
+  for(int i = 1;i<pointNum-1;i++)
+  {
+    (((timefromStart[i+1] - timefromStart[i])/3.0f)<_deltaX)?_deltaX=((timefromStart[i+1] - timefromStart[i])/3.0f):NULL;
+  }
+}
+
+/**
+ * @brief 判断关节速度是否超限制
+ * 
+ * @param _jointTargetptr 
+ * @return true 
+ * @return false 
+ */
+bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable,float _deltaX)
+{
+  for(int i = 0;i<JointAmount;i++)
+  {
+    
+  }
 }
 
 
@@ -217,7 +247,7 @@ void MotionControllerClassdef::JointControl()
   // xVariable = timefromStart[0];
   // deltaX = 0.01;
 
-  if(timefromStart[0] <= xVariable && xVariable < timefromStart[pointNum -1])
+  if(interOK && timefromStart[0] <= xVariable && xVariable < timefromStart[pointNum -1])
   {
     tempxVariable = xVariable + deltaX;
     if(tempxVariable > timefromStart[pointNum-1])     //自变量超过末值
@@ -225,16 +255,18 @@ void MotionControllerClassdef::JointControl()
       deltaX = timefromStart[pointNum-1]-xVariable;
       tempxVariable = timefromStart[pointNum-1];
     }
-    else if()   //某关节超限速
+    else if(true)   //某关节超限速，用比例减小法（乘0.6）查找不超限的自变量 TODO:有没有更好的办法？如何判断超越的幅度？
     {
-
+      for(int i = 0;i<JointAmount;)
+      {
+        
+      }
     }
     else if(tempxVariable > timefromStart[curveNO+1]) //跳转到下一条曲线
     {
       curveNO++;
     }
   }
-  // else if()   //关节超限速
 
   /* 设置目标值 第i个关节 */
   for(int i = 0;i<JointAmount;i++)
@@ -294,3 +326,7 @@ void MotionControllerClassdef::printInterCoe()
 // }
 
 /************************ COPYRIGHT(C) SCUT-ROBOTLAB **************************/
+
+
+
+(jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]))

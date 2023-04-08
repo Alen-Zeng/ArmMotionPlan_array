@@ -67,16 +67,20 @@ private:
     /* 三次样条关键系数,（参见石瑞民数值计算page99） */
     double Mk[MaxPointAmount];
     /* 设置目标使用的变量 */
-    int curveNO = 0;    //第curveNO条曲线
-    int tskCyclic = 1;  //设置目标函数执行的周期（单位ms）
+    bool interOK = false; //插值计算完成
+    int curveNO = 0;      //第curveNO条曲线
+    int tskCyclic = 1;    //设置目标函数执行的周期（单位ms）
+
+    void adjustDeltaX(float& _deltaX);
+    bool judgeSpeedLimit();
 public:
     int pointNum;                                             //轨迹点数量
     JointDataPackStructdef jointDataPack[JointAmount];        //每一个关节的数据
     double timefromStart[MaxPointAmount];                     //到达每个轨迹点的时间点
     InterpolaCoeStructdef jointInterCoe[JointAmount];         //每个时间点的各个电机的三次插值化简式系数
     float* jointTargetptr;                                    //关节目标
-    float* jointSpeedLimit[JointAmount] = {nullptr};          //关节速度上限
-    float deltaX = 0.01;                                      //曲线自变量增量
+    float* jointSpeedLimit[JointAmount] = {nullptr};          //关节速度上限（m/s 或 rad/s）
+    float deltaX = 0.001;                                      //曲线自变量增量
     float xVariable = 0;                                      //曲线自变量（计算目标值）
 
     MotionControllerClassdef();
@@ -86,7 +90,7 @@ public:
     void receiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _timefromStart,int _pointNum);
     void interpolation();
     void chaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size);
-    template <class... Limittype> void setJointSpeedLimit(const Limittype*... _limits);
+    template <class... Limittype> void setJointSpeedLimit(Limittype*... _limits);
     void JointControl();
     void printInterCoe();
     // void GetCoe(int JointNO,int CoeNO,double* Datapool);
