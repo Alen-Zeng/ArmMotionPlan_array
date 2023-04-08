@@ -71,15 +71,16 @@ private:
     int curveNO = 0;      //第curveNO条曲线
     int tskCyclic = 1;    //设置目标函数执行的周期（单位ms）
 
+    template <typename T>const T &myabs(const T &input){return input < (T)0 ? -input : input;}
     void adjustDeltaX(float& _deltaX);
-    bool judgeSpeedLimit();
+    bool judgeSpeedLimit(float& _tempxVariable);
 public:
     int pointNum;                                             //轨迹点数量
     JointDataPackStructdef jointDataPack[JointAmount];        //每一个关节的数据
     double timefromStart[MaxPointAmount];                     //到达每个轨迹点的时间点
     InterpolaCoeStructdef jointInterCoe[JointAmount];         //每个时间点的各个电机的三次插值化简式系数
     float* jointTargetptr;                                    //关节目标
-    float* jointSpeedLimit[JointAmount] = {nullptr};          //关节速度上限（m/s 或 rad/s）
+    float* jointSpeedLimit[JointAmount] = {nullptr};          //关节速度上限指针（m/s 或 rad/s）
     float deltaX = 0.001;                                      //曲线自变量增量
     float xVariable = 0;                                      //曲线自变量（计算目标值）
 

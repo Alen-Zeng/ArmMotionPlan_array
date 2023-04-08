@@ -61,6 +61,7 @@ MotionControllerClassdef::MotionControllerClassdef()
   }
 }
 
+
 /**
  * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
  * 
@@ -76,7 +77,6 @@ MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget):jointTar
     Bk[i] = 2;
   }
 }
-
 
 
 /**
@@ -220,19 +220,43 @@ void MotionControllerClassdef::adjustDeltaX(float& _deltaX)
   }
 }
 
+
 /**
  * @brief 判断关节速度是否超限制
  * 
  * @param _jointTargetptr 
- * @return true 
- * @return false 
+ * @return true 有关节超速
+ * @return false 没有关节超速
  */
-bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable,float _deltaX)
+bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
 {
-  for(int i = 0;i<JointAmount;i++)
+  float tempDeltaJointTarget = 0;
+  if(_tempxVariable <= timefromStart[curveNO+1])  //目标位于当前曲线
   {
-    
+    for(int i = 0;i<JointAmount;i++)
+    {   //第i个关节
+      tempDeltaJointTarget = (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - _tempxVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((_tempxVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - _tempxVariable) + jointInterCoe[i].FourthCoe[curveNO]*(_tempxVariable - timefromStart[curveNO])) 
+        - (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
+      if((myabs(tempDeltaJointTarget)/tskCyclic)*0.001 > *jointSpeedLimit[i])
+      {
+        return true;
+      }
+    }
   }
+  else if(_tempxVariable > timefromStart[curveNO+1])  //目标位于下一条曲线
+  {
+    for(int i = 0;i<JointAmount;i++)
+    {   //第i个关节
+      tempDeltaJointTarget = (jointInterCoe[i].FirstCoe[curveNO+1]*pow((timefromStart[curveNO+2] - _tempxVariable),3) + jointInterCoe[i].SecCoe[curveNO+1]*pow((_tempxVariable - timefromStart[curveNO+1]),3) + jointInterCoe[i].ThirdCoe[curveNO+1]*(timefromStart[curveNO+2] - _tempxVariable) + jointInterCoe[i].FourthCoe[curveNO+1]*(_tempxVariable - timefromStart[curveNO+1]))
+        - (jointInterCoe[i].FirstCoe[curveNO+1]*pow((timefromStart[curveNO+2] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO+1]*pow((xVariable - timefromStart[curveNO+1]),3) + jointInterCoe[i].ThirdCoe[curveNO+1]*(timefromStart[curveNO+2] - xVariable) + jointInterCoe[i].FourthCoe[curveNO+1]*(xVariable - timefromStart[curveNO+1]));
+      if((myabs(tempDeltaJointTarget)/tskCyclic*0.001 > *jointSpeedLimit[i]))
+      {
+        return true;
+      }
+    }
+  }
+
+  return false;   //没有关节超速
 }
 
 
@@ -257,10 +281,12 @@ void MotionControllerClassdef::JointControl()
     }
     else if(true)   //某关节超限速，用比例减小法（乘0.6）查找不超限的自变量 TODO:有没有更好的办法？如何判断超越的幅度？
     {
-      for(int i = 0;i<JointAmount;)
+      while (judgeSpeedLimit(tempxVariable))
       {
-        
+        deltaX = 0.6*deltaX;
+        tempxVariable = xVariable + deltaX;
       }
+      
     }
     else if(tempxVariable > timefromStart[curveNO+1]) //跳转到下一条曲线
     {
@@ -268,6 +294,7 @@ void MotionControllerClassdef::JointControl()
     }
   }
 
+  xVariable = tempxVariable;
   /* 设置目标值 第i个关节 */
   for(int i = 0;i<JointAmount;i++)
   {
@@ -327,6 +354,3 @@ void MotionControllerClassdef::printInterCoe()
 
 /************************ COPYRIGHT(C) SCUT-ROBOTLAB **************************/
 
-
-
-(jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]))
