@@ -216,7 +216,7 @@ void MotionControllerClassdef::adjustDeltaX(float& _deltaX)
   _deltaX = (timefromStart[1] - timefromStart[0])/3.0f;
   for(int i = 1;i<pointNum-1;i++)
   {
-    (((timefromStart[i+1] - timefromStart[i])/3.0f)<_deltaX)?_deltaX=((timefromStart[i+1] - timefromStart[i])/3.0f):NULL;
+    (((timefromStart[i+1] - timefromStart[i])/3.0f)<_deltaX)?_deltaX=((timefromStart[i+1] - timefromStart[i])/3.0f):0;
   }
 }
 
@@ -270,7 +270,7 @@ void MotionControllerClassdef::limitSpeed(float& _tempdeltaX, float& _tempxVaria
 {
   while (judgeSpeedLimit(_tempxVariable))
   {
-    _tempdeltaX = 0.6*_tempdeltaX;
+    _tempdeltaX = 0.6f*_tempdeltaX;
     _tempxVariable = xVariable + _tempdeltaX;
   }
 }
