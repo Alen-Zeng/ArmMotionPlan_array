@@ -67,7 +67,7 @@ MotionControllerClassdef::MotionControllerClassdef()
  * 
  * @param _jointTarget 外部关节目标数组
  */
-MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget):jointTargetptr(_jointTarget)
+MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskCyclic):jointTargetptr(_jointTarget),tskCyclic(_tskCyclic)
 {
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
@@ -237,7 +237,7 @@ bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
     {   //第i个关节
       tempDeltaJointTarget = (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - _tempxVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((_tempxVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - _tempxVariable) + jointInterCoe[i].FourthCoe[curveNO]*(_tempxVariable - timefromStart[curveNO])) 
         - (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
-      if((myabs(tempDeltaJointTarget)/tskCyclic)*0.001 > *jointSpeedLimit[i])
+      if((myabs(tempDeltaJointTarget)/tskCyclic)*1000.0f > *jointSpeedLimit[i])
       {
         return true;
       }
@@ -249,7 +249,7 @@ bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
     {   //第i个关节
       tempDeltaJointTarget = (jointInterCoe[i].FirstCoe[curveNO+1]*pow((timefromStart[curveNO+2] - _tempxVariable),3) + jointInterCoe[i].SecCoe[curveNO+1]*pow((_tempxVariable - timefromStart[curveNO+1]),3) + jointInterCoe[i].ThirdCoe[curveNO+1]*(timefromStart[curveNO+2] - _tempxVariable) + jointInterCoe[i].FourthCoe[curveNO+1]*(_tempxVariable - timefromStart[curveNO+1]))
         - (jointInterCoe[i].FirstCoe[curveNO+1]*pow((timefromStart[curveNO+2] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO+1]*pow((xVariable - timefromStart[curveNO+1]),3) + jointInterCoe[i].ThirdCoe[curveNO+1]*(timefromStart[curveNO+2] - xVariable) + jointInterCoe[i].FourthCoe[curveNO+1]*(xVariable - timefromStart[curveNO+1]));
-      if((myabs(tempDeltaJointTarget)/tskCyclic*0.001 > *jointSpeedLimit[i]))
+      if((myabs(tempDeltaJointTarget)/tskCyclic)*1000.0f > *jointSpeedLimit[i])
       {
         return true;
       }

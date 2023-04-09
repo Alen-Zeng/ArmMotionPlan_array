@@ -86,7 +86,7 @@ public:
     float xVariable = 0;                                      //曲线自变量（计算目标值）
 
     MotionControllerClassdef();
-    MotionControllerClassdef(float* _jointTarget);
+    MotionControllerClassdef(float* _jointTarget,int _tskCyclic);
     ~MotionControllerClassdef(){};
 
     void receiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _timefromStart,int _pointNum);
