@@ -118,7 +118,9 @@ void MotionControllerClassdef::receiveTracjectory(double _JointsPosition[JointAm
  */
 void MotionControllerClassdef::interpolation() 
 {
-  /* 计算时间间隔Hk */
+  if(!interOK)
+  {
+    /* 计算时间间隔Hk */
     for(int j = 0;j<pointNum-1;j++)
     {
         /* 第j个时间点，计算时间间隔，最后一个时间点不单独遍历 */
@@ -157,6 +159,8 @@ void MotionControllerClassdef::interpolation()
             jointInterCoe[i].FourthCoe[j] = (jointDataPack[i].JointPosition[j+1]/Hk[j] - Mk[j+1]*Hk[j]/6);
         }
     }
+    interOK = true;
+  }
 }
 
 
