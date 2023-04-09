@@ -87,7 +87,7 @@ MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskC
  * @param _JointsAcceleration 所有关节目标加速度
  * @param _timefromStart 所有轨迹点到达时间
  */
-void MotionControllerClassdef::receiveTracjectory(double _JointsPosition[JointAmount][MaxPointAmount],double _JointsVelocity[JointAmount][MaxPointAmount],double* _timefromStart,int _pointNum) 
+void MotionControllerClassdef::receiveTracjectory(float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],float* _timefromStart,int _pointNum) 
 {
   /* 记录轨迹点数量 */
   pointNum = _pointNum;
@@ -173,7 +173,7 @@ void MotionControllerClassdef::interpolation()
  * @param xk 待求解的值
  * @param dk 常数项
  */
-void MotionControllerClassdef::chaseLUFactorization(double* bk,double* ak,double* ck,double* xk,double* dk,int size)
+void MotionControllerClassdef::chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size)
 {
     /* 开始追赶计算 */
     qk[0] = bk[0];
@@ -344,7 +344,7 @@ void MotionControllerClassdef::printInterCoe()
  * @param JointNO 哪一个关节
  * @param CoeNO 哪一项系数
  */
-// void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,double* Datapool)
+// void MotionControllerClassdef::GetCoe(int JointNO,int CoeNO,float* Datapool)
 // {
 //   if(0<=JointNO && JointNO<JointAmount && 1<= CoeNO && CoeNO<=4)
 //   {
