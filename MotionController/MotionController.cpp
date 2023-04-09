@@ -296,11 +296,9 @@ void MotionControllerClassdef::JointControl()
     {
       tempdeltaX = timefromStart[pointNum-1]-xVariable;
       tempxVariable = timefromStart[pointNum-1];
-      /* TODO:逻辑 */
       limitSpeed(tempdeltaX,tempxVariable);
     }
-    /* TODO判断逻辑？ */
-    else if(tempxVariable > timefromStart[curveNO+1]) //跳转到下一条曲线
+    else if((limitSpeed(tempdeltaX,tempxVariable),tempxVariable > timefromStart[curveNO+1])) //跳转到下一条曲线
     {
       curveNO++;
     }
