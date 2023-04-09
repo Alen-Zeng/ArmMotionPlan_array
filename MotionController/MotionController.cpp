@@ -89,25 +89,27 @@ MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskC
  */
 void MotionControllerClassdef::receiveTracjectory(float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],float* _timefromStart,int _pointNum) 
 {
-  /* 记录轨迹点数量 */
-  pointNum = _pointNum;
+  if(!interOK)
+  {  /* 记录轨迹点数量 */
+    pointNum = _pointNum;
 
-  /* 第i个关节 */
-  for(int i = 0;i<JointAmount;i++)
-  {
-
-    for(int j = 0;j<pointNum;j++)
+    /* 第i个关节 */
+    for(int i = 0;i<JointAmount;i++)
     {
-      /* 第j个轨迹点的关节位置 */
-      jointDataPack[i].JointPosition[j] = _JointsPosition[i][j];
-      /* 第j个轨迹点的关节目标速度 */
-      jointDataPack[i].JointVelocity[j] = _JointsVelocity[i][j];
+
+      for(int j = 0;j<pointNum;j++)
+      {
+        /* 第j个轨迹点的关节位置 */
+        jointDataPack[i].JointPosition[j] = _JointsPosition[i][j];
+        /* 第j个轨迹点的关节目标速度 */
+        jointDataPack[i].JointVelocity[j] = _JointsVelocity[i][j];
+      }
     }
-  }
-  /* 第j个轨迹点的到达时间 */
-  for(int i = 0;i<pointNum;i++)
-  {
-    timefromStart[i] = _timefromStart[i];
+    /* 第j个轨迹点的到达时间 */
+    for(int i = 0;i<pointNum;i++)
+    {
+      timefromStart[i] = _timefromStart[i];
+    }
   }
 }
 
