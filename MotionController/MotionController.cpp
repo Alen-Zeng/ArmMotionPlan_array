@@ -199,20 +199,6 @@ void MotionControllerClassdef::chaseLUFactorization(float* bk,float* ak,float* c
 
 
 /**
- * @brief 设置关节速度限制（必须）
- * 
- * @tparam Limittype 
- * @param _limits 必须是float*类型，否则出错
- */
-template <class... Limittype>
-void MotionControllerClassdef::setJointSpeedLimit(Limittype*... _limits)
-{
-  int limitNO = 0;
-  int array[] = {(jointSpeedLimit[limitNO] = _limits, limitNO++)...};
-}
-
-
-/**
  * @brief 根据最小时间间隔计算合适的deltaX
  * @note 防止一次性越过多条曲线的情况
  * @param _deltaX 默认曲线自变量增量

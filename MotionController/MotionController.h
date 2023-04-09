@@ -92,8 +92,18 @@ public:
     void receiveTracjectory(float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],float* _timefromStart,int _pointNum);
     void interpolation();
     void chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
-    template <class... Limittype> void setJointSpeedLimit(Limittype*... _limits);
     void JointControl();
+    /**
+     * @brief 设置关节速度限制（必须）
+     * 
+     * @tparam Limittype 
+     * @param _limits 必须是float*类型，否则出错
+     */
+    template <class... Limittype> void setJointSpeedLimit(Limittype*... _limits)
+    {
+      int limitNO = 0;
+      int array[] = {(jointSpeedLimit[limitNO] = _limits, limitNO++)...};
+    }
     void printInterCoe();
     // void GetCoe(int JointNO,int CoeNO,float* Datapool);
 };
