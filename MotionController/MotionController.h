@@ -78,12 +78,14 @@ private:
 public:
     int pointNum;                                             //轨迹点数量
     JointDataPackStructdef jointDataPack[JointAmount];        //每一个关节的数据
-    float timefromStart[MaxPointAmount];                     //到达每个轨迹点的时间点
-    InterpolaCoeStructdef jointInterCoe[JointAmount];         //每个时间点的各个电机的三次插值化简式系数
+    float timefromStart[MaxPointAmount];                      //到达每个轨迹点的时间点
+    InterpolaCoeStructdef jointCubeInterCoe[JointAmount];     //每个时间点的各个电机的三次插值化简式系数
+    float jointLinearInterCoe[JointAmount][MaxPointAmount-1]; //每个时间点的各个电机的线性插值化简式系数
     float* jointTargetptr;                                    //关节目标
     float* jointSpeedLimit[JointAmount] = {nullptr};          //关节速度上限指针（m/s 或 rad/s）
     float deltaX = 0.001;                                     //默认曲线自变量增量
     float xVariable = 0;                                      //曲线自变量（计算目标值）
+    bool useCubic = false;                                    //是否使用三次插值，不使用默认为线性插值
 
     MotionControllerClassdef();
     MotionControllerClassdef(float* _jointTarget,int _tskCyclic);
@@ -92,7 +94,8 @@ public:
     void receiveTracjectory(float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],float* _timefromStart,int _pointNum);
     void interpolation();
     void chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
-    void JointControl();
+    void jointControl();
+    void motionControlAll(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false);
     /**
      * @brief 设置关节速度限制（必须）
      * 
