@@ -284,7 +284,7 @@ bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
 
 /**
  * @brief 关节限速
- * @note 用比例减小法（乘0.6）查找不超限的自变量 TODO:有没有更好的办法？如何判断超越的幅度？
+ * @note 用比例减小法（乘0.618）查找不超限的自变量 TODO:有没有更好的办法？如何判断超越的幅度？
  * @param _tempdeltaX 
  * @param _tempxVariable 
  */
@@ -292,7 +292,7 @@ void MotionControllerClassdef::limitSpeed(float& _tempdeltaX, float& _tempxVaria
 {
   while (judgeSpeedLimit(_tempxVariable))
   {
-    _tempdeltaX = 0.6f*_tempdeltaX;
+    _tempdeltaX = 0.618f*_tempdeltaX;
     _tempxVariable = xVariable + _tempdeltaX;
   }
 }
