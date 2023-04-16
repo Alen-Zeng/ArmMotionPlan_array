@@ -183,7 +183,7 @@ void MotionControllerClassdef::interpolation()
       for(int i = 0;i<JointAmount;i++)
       {
         /* 第j个轨迹点 */
-        for(int j = 1;j<pointNum-1;j++)
+        for(int j = 0;j<pointNum-1;j++)
         {
           jointLinearInterCoe[i][j] = (jointDataPack[i].JointPosition[j+1] - jointDataPack[i].JointPosition[j])/(timefromStart[j+1] - timefromStart[j]);
         }
