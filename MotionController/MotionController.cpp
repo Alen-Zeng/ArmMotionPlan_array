@@ -98,7 +98,7 @@ MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskC
  * @param _JointsVelocity 所有关节目标速度，使用线性插值时可以不传入
  * @param _useCubic 是否使用三次插值。默认为线性插值。若传入速度一定要使能这个标志位
  */
-void MotionControllerClassdef::receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false) 
+void MotionControllerClassdef::receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],bool _useCubic) 
 {
   if(!interOK)
   {  /* 记录轨迹点数量 */

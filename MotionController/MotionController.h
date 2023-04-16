@@ -103,7 +103,7 @@ public:
       int limitNO = 0;
       int array[] = {(jointSpeedLimit[limitNO] = _limits, limitNO++)...};
     }
-    void receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false);
+    void receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = nullptr,bool _useCubic = false);
     void interpolation();
     void jointControl();
     // void printInterCoe();
