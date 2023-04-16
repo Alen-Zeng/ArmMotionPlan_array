@@ -71,6 +71,7 @@ private:
     int curveNO = 0;      //第curveNO条曲线
     int tskCyclic = 1;    //设置目标函数执行的周期（单位ms）
 
+    void chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
     template <typename T>const T &myabs(const T &input){return input < (T)0 ? -input : input;}
     void adjustDeltaX(float& _deltaX);
     bool judgeSpeedLimit(float& _tempxVariable);
@@ -85,17 +86,12 @@ public:
     float* jointSpeedLimit[JointAmount] = {nullptr};          //关节速度上限指针（m/s 或 rad/s）
     float deltaX = 0.001;                                     //默认曲线自变量增量
     float xVariable = 0;                                      //曲线自变量（计算目标值）
-    bool useCubic = false;                                    //是否使用三次插值，不使用默认为线性插值
+    bool useCubic = false;                                    //是否使用三次插值，不使用则使用线性插值
 
     MotionControllerClassdef();
     MotionControllerClassdef(float* _jointTarget,int _tskCyclic);
     ~MotionControllerClassdef(){};
 
-    void receiveTracjectory(float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],float* _timefromStart,int _pointNum);
-    void interpolation();
-    void chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
-    void jointControl();
-    void motionControlAll(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false);
     /**
      * @brief 设置关节速度限制（必须）
      * 
@@ -107,7 +103,10 @@ public:
       int limitNO = 0;
       int array[] = {(jointSpeedLimit[limitNO] = _limits, limitNO++)...};
     }
-    void printInterCoe();
+    void receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false);
+    void interpolation();
+    void jointControl();
+    // void printInterCoe();
     // void GetCoe(int JointNO,int CoeNO,float* Datapool);
 };
 

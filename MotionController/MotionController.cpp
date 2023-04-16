@@ -92,16 +92,18 @@ MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskC
 /**
  * @brief 接收并更新离散关节位置、各位置目标速度、各位置目标加速度和到达各轨迹点的时间点
  * @note 参数vector第一层：各个关节；第二层：某一关节的各个数据
- * @param _JointsPosition 所有关节位置
- * @param _JointsVelocity 所有关节目标速度
- * @param _JointsAcceleration 所有关节目标加速度
+ * @param _pointNum 轨迹点数量
  * @param _timefromStart 所有轨迹点到达时间
+ * @param _JointsPosition 所有关节位置
+ * @param _JointsVelocity 所有关节目标速度，使用线性插值时可以不传入
+ * @param _useCubic 是否使用三次插值。默认为线性插值。若传入速度一定要使能这个标志位
  */
-void MotionControllerClassdef::receiveTracjectory(float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount],float* _timefromStart,int _pointNum) 
+void MotionControllerClassdef::receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false) 
 {
   if(!interOK)
   {  /* 记录轨迹点数量 */
     pointNum = _pointNum;
+    useCubic = _useCubic;
 
     /* 第i个关节 */
     for(int i = 0;i<JointAmount;i++)
@@ -112,7 +114,8 @@ void MotionControllerClassdef::receiveTracjectory(float _JointsPosition[JointAmo
         /* 第j个轨迹点的关节位置 */
         jointDataPack[i].JointPosition[j] = _JointsPosition[i][j];
         /* 第j个轨迹点的关节目标速度 */
-        jointDataPack[i].JointVelocity[j] = _JointsVelocity[i][j];
+        if(useCubic)
+          jointDataPack[i].JointVelocity[j] = _JointsVelocity[i][j];
       }
     }
     /* 第j个轨迹点的到达时间 */
@@ -339,33 +342,20 @@ void MotionControllerClassdef::jointControl()
 }
 
 
-/**
- * @brief 运动控制统一接口
- * @param _JointsPosition 
- * @param _JointsVelocity 
- * @param _timefromStart 
- * @param _pointNum 
- * @param _useCubic 是否使用三次插值。默认为线性插值。
- */
-void MotionControllerClassdef::motionControlAll(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = {0},bool _useCubic = false)
-{
-  receiveTracjectory(_JointsPosition,_JointsVelocity,_timefromStart,_pointNum);
-}
-
 
 /**
  * @brief 打印系数
  * 
  */
-void MotionControllerClassdef::printInterCoe()
-{
+// void MotionControllerClassdef::printInterCoe()
+// {
   // for(int i = 0;i<jointCubeInterCoe.Time.size();i++)
   // {
   //   std::cout<<"M"<<i<<":"<<Mk.at(i)<<"  ";
   //   std::cout<<jointCubeInterCoe.InterpolaCoe.at(0).FirstCoe.at(i)<<"*("<<timefromStart.at(i+1)<<"-x)^3+"<<jointCubeInterCoe.InterpolaCoe.at(0).SecCoe.at(i)<<"*(x-"<<timefromStart.at(i)<<")^3+"<<jointCubeInterCoe.InterpolaCoe.at(0).ThirdCoe.at(i)<<"*("<<timefromStart.at(i+1)<<"-x)+"<<jointCubeInterCoe.InterpolaCoe.at(0).FourthCoe.at(i)<<"*(x-"<<timefromStart.at(i)<<")"<<std::endl;
   // }
   // std::cout<<"Mn:"<<Mk.back()<<std::endl;
-}
+// }
 
 
 /**
