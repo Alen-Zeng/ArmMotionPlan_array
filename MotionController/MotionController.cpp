@@ -237,7 +237,7 @@ bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
     for(int i = 0;i<JointAmount;i++)
     {   //第i个关节
       tempDeltaJointTarget = (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - _tempxVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((_tempxVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - _tempxVariable) + jointInterCoe[i].FourthCoe[curveNO]*(_tempxVariable - timefromStart[curveNO])) 
-        - (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
+        - jointTargetptr[i];
       if((myabs(tempDeltaJointTarget)/tskCyclic)*1000.0f > *jointSpeedLimit[i])
       {
         return true;
@@ -249,7 +249,7 @@ bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
     for(int i = 0;i<JointAmount;i++)
     {   //第i个关节
       tempDeltaJointTarget = (jointInterCoe[i].FirstCoe[curveNO+1]*pow((timefromStart[curveNO+2] - _tempxVariable),3) + jointInterCoe[i].SecCoe[curveNO+1]*pow((_tempxVariable - timefromStart[curveNO+1]),3) + jointInterCoe[i].ThirdCoe[curveNO+1]*(timefromStart[curveNO+2] - _tempxVariable) + jointInterCoe[i].FourthCoe[curveNO+1]*(_tempxVariable - timefromStart[curveNO+1]))
-        - (jointInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]));
+        - jointTargetptr[i];
       if((myabs(tempDeltaJointTarget)/tskCyclic)*1000.0f > *jointSpeedLimit[i])
       {
         return true;
