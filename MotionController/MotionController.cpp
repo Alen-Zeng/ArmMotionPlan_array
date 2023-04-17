@@ -250,7 +250,8 @@ void MotionControllerClassdef::adjustDeltaX(float& _deltaX)
  */
 bool MotionControllerClassdef::judgeSpeedLimit(float& _tempxVariable)
 {
-  float tempDeltaJointTarget = 0;
+  static float tempDeltaJointTarget = 0;
+  tempDeltaJointTarget = 0;
   if(_tempxVariable <= timefromStart[curveNO+1])  //目标位于当前曲线
   {
     for(int i = 0;i<JointAmount;i++)
@@ -304,13 +305,15 @@ void MotionControllerClassdef::limitSpeed(float& _tempdeltaX, float& _tempxVaria
  */
 void MotionControllerClassdef::jointControl()
 {
-  float tempxVariable = 0;
-
+  static float tempxVariable = 0;
+  static float tempdeltaX = 0;
+  
+  tempxVariable = 0;
   if(interOK && xVariable == 0)  //插值计算但未开始执行
   {
     adjustDeltaX(deltaX); //计算本次默认deltaX
   }
-  float tempdeltaX = deltaX;
+  tempdeltaX = deltaX;
   if(interOK && timefromStart[0] <= xVariable && xVariable < timefromStart[pointNum -1])  //插值计算完成且正在执行
   {
     tempxVariable = xVariable + tempdeltaX;
