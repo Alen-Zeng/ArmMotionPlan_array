@@ -302,8 +302,10 @@ void MotionControllerClassdef::limitSpeed(float& _tempdeltaX, float& _tempxVaria
 /**
  * @brief 设置关节目标
  * @note 在任务中定时调用
+ * @return true 轨迹点正在执行中
+ * @return false 没有轨迹点正在执行或轨迹点已经执行完成
  */
-void MotionControllerClassdef::jointControl()
+bool MotionControllerClassdef::jointControl()
 {
   static float tempxVariable = 0;
   static float tempdeltaX = 0;
@@ -334,6 +336,7 @@ void MotionControllerClassdef::jointControl()
       jointTargetptr[i] = (float)(useCubic?(jointCubeInterCoe[i].FirstCoe[curveNO]*pow((timefromStart[curveNO+1] - xVariable),3) + jointCubeInterCoe[i].SecCoe[curveNO]*pow((xVariable - timefromStart[curveNO]),3) + jointCubeInterCoe[i].ThirdCoe[curveNO]*(timefromStart[curveNO+1] - xVariable) + jointCubeInterCoe[i].FourthCoe[curveNO]*(xVariable - timefromStart[curveNO]))
                                           :(jointDataPack[i].JointPosition[curveNO]+jointLinearInterCoe[i][curveNO]*(xVariable - timefromStart[curveNO])));
     }
+    return true; //正在执行中
   }
   else if(interOK && xVariable == timefromStart[pointNum-1])  //插值计算完成且执行完成
   {
@@ -341,7 +344,7 @@ void MotionControllerClassdef::jointControl()
     xVariable = 0;
     interOK = false;
   }
-
+  return false; //执行完成或没有在执行
 }
 
 

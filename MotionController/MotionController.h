@@ -105,7 +105,7 @@ public:
     }
     void receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = nullptr,bool _useCubic = false);
     void interpolation();
-    void jointControl();
+    bool jointControl();
     // void printInterCoe();
     // void GetCoe(int JointNO,int CoeNO,float* Datapool);
 };
