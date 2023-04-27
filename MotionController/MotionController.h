@@ -48,7 +48,7 @@ typedef struct _InterpolaCoeStructdef
 
 
 /**
- * @brief 运动控制器
+ * @brief 轨迹运动控制器
  * 
  */
 class MotionControllerClassdef
@@ -106,6 +106,7 @@ public:
     void receiveTracjectory(int _pointNum,float* _timefromStart,float _JointsPosition[JointAmount][MaxPointAmount],float _JointsVelocity[JointAmount][MaxPointAmount] = nullptr,bool _useCubic = false);
     void interpolation();
     bool jointControl();
+    void abort();
     // void printInterCoe();
     // void GetCoe(int JointNO,int CoeNO,float* Datapool);
 };

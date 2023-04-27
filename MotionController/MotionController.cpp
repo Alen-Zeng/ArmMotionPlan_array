@@ -348,6 +348,18 @@ bool MotionControllerClassdef::jointControl()
 }
 
 
+/**
+ * @brief 终止轨迹点执行
+ * @warning 终止执行后需要重新调用receiveTracjectory、interpolation重新执行轨迹点
+ * 
+ */
+void MotionControllerClassdef::abort()
+{
+  curveNO = 0;
+  xVariable = 0;
+  interOK = false;
+}
+
 
 /**
  * @brief 打印系数
