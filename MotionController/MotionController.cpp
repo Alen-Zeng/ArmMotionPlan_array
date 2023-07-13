@@ -34,6 +34,8 @@
         - 调用interpolation进行插值运算
         - 以上的代码只需要在JointControl函数调用前调用一次
         - 调用JointControl函数，该函数需要在任务中循环调用以实现增量控制
+        - 在构造函数中可以设置是否跟随真实时间，跟随真实时间时，请设置目标函数执行的周期为10ms，轨迹点时间间隔
+          不低于0.1s，此时轨迹点时间单位为秒。任一条件不满足将自动不跟随真实时间。
     @warning
       -# 
       -# 
@@ -76,8 +78,10 @@ MotionControllerClassdef::MotionControllerClassdef()
  * @brief Construct a new Motion Controller Classdef:: Motion Controller Classdef object
  * 
  * @param _jointTarget 外部关节目标数组
+ * @param _tskCyclic 目标函数执行的周期（单位ms）
+ * @param _realTime 是否跟随真实时间，跟随真实时间时，请设置目标函数执行的周期为10ms，轨迹点时间间隔不低于0.1s，此时轨迹点时间单位为秒
  */
-MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskCyclic):jointTargetptr(_jointTarget),tskCyclic(_tskCyclic)
+MotionControllerClassdef::MotionControllerClassdef(float *_jointTarget, int _tskCyclic, bool _realTime) : jointTargetptr(_jointTarget), tskCyclic(_tskCyclic), realTime(_realTime)
 {
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
@@ -93,7 +97,7 @@ MotionControllerClassdef::MotionControllerClassdef(float* _jointTarget,int _tskC
  * @brief 接收并更新离散关节位置、各位置目标速度、各位置目标加速度和到达各轨迹点的时间点
  * @note 参数vector第一层：各个关节；第二层：某一关节的各个数据
  * @param _pointNum 轨迹点数量
- * @param _timefromStart 所有轨迹点到达时间
+ * @param _timefromStart 所有轨迹点到达时间，跟随真实时间时，轨迹点时间单位为秒
  * @param _JointsPosition 所有关节位置
  * @param _JointsVelocity 所有关节目标速度，使用线性插值时可以不传入
  * @param _useCubic 是否使用三次插值。默认为线性插值。若传入速度一定要使能这个标志位
@@ -227,16 +231,26 @@ void MotionControllerClassdef::chaseLUFactorization(float* bk,float* ak,float* c
 
 
 /**
- * @brief 根据最小时间间隔计算合适的deltaX
+ * @brief 根据最小时间间隔计算合适的deltaX，若开启真实时间跟随则deltaX为0.01
  * @note 防止一次性越过多条曲线的情况
  * @param _deltaX 默认曲线自变量增量
  */
 void MotionControllerClassdef::adjustDeltaX(float& _deltaX)
 {
-  _deltaX = (timefromStart[1] - timefromStart[0])/3.0f;
-  for(int i = 1;i<pointNum-1;i++)
+  _deltaX = (timefromStart[1] - timefromStart[0]);
+  for (int i = 1; i < pointNum - 1; i++)
   {
-    (((timefromStart[i+1] - timefromStart[i])/3.0f)<_deltaX)?_deltaX=((timefromStart[i+1] - timefromStart[i])/3.0f):0;
+    ((timefromStart[i + 1] - timefromStart[i]) < _deltaX) ? _deltaX = (timefromStart[i + 1] - timefromStart[i]) : 0;
+  }
+
+  /* 当参数符合真实时间跟随规则时 */
+  if (realTime == true  /* 开启真实时间跟随 */ && tskCyclic == 10.0f /* 执行周期为10ms */ && _deltaX >= 0.1f /* 轨迹点时间间隔大于等于0.1秒 */)
+  {
+    _deltaX = 0.01f;
+  }
+  else
+  {
+    _deltaX = deltaX / 3.0f;
   }
 }
 

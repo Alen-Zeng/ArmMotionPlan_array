@@ -70,6 +70,7 @@ private:
     bool interOK = false; //插值计算完成
     int curveNO = 0;      //第curveNO条曲线
     int tskCyclic = 1;    //设置目标函数执行的周期（单位ms）
+    bool realTime = false;
 
     void chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
     template <typename T>const T &myabs(const T &input){return input < (T)0 ? -input : input;}
@@ -89,7 +90,7 @@ public:
     bool useCubic = false;                                    //是否使用三次插值，不使用则使用线性插值
 
     MotionControllerClassdef();
-    MotionControllerClassdef(float* _jointTarget,int _tskCyclic);
+    MotionControllerClassdef(float *_jointTarget, int _tskCyclic, bool _realTime = false);
     ~MotionControllerClassdef(){};
 
     /**
