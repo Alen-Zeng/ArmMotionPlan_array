@@ -73,7 +73,7 @@ private:
     bool realTime = false;
 
     void chaseLUFactorization(float* bk,float* ak,float* ck,float* xk,float* dk,int size);
-    template <typename T>const T &myabs(const T &input){return input < (T)0 ? -input : input;}
+    template <typename T>const T myabs(const T &input){return input < (T)0 ? -input : input;}
     void adjustDeltaX(float& _deltaX);
     bool judgeSpeedLimit(float& _tempxVariable);
     void limitSpeed(float& _tempdeltaX, float& _tempxVariable);

@@ -81,7 +81,7 @@ MotionControllerClassdef::MotionControllerClassdef()
  * @param _tskCyclic 目标函数执行的周期（单位ms）
  * @param _realTime 是否跟随真实时间，跟随真实时间时，请设置目标函数执行的周期为10ms，轨迹点时间间隔不低于0.1s，此时轨迹点时间单位为秒
  */
-MotionControllerClassdef::MotionControllerClassdef(float *_jointTarget, int _tskCyclic, bool _realTime) : jointTargetptr(_jointTarget), tskCyclic(_tskCyclic), realTime(_realTime)
+MotionControllerClassdef::MotionControllerClassdef(float *_jointTarget, int _tskCyclic, bool _realTime) : tskCyclic(_tskCyclic), realTime(_realTime), jointTargetptr(_jointTarget)
 {
   /* 初始化轨迹点数量为0 */
   pointNum = 0;
