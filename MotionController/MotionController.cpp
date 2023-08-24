@@ -28,14 +28,15 @@
          定长数组的方式进行存储和运算
       -# 使用方法：
         - 使用前，确定关节数量和最大轨迹点数量
-        - 创建MotionControllerClassdef对象，并在构造函数中传入目标指针和freertos执行的频率
+        - 创建MotionControllerClassdef对象，并在构造函数中传入目标指针、FreeRTOS任务执行的频率和真实时间跟随开关
         - 调用setJointSpeedLimit函数设置关节速度限制
         - 调用receiveTracjectory函数接收轨迹点数据
         - 调用interpolation进行插值运算
-        - 以上的代码只需要在JointControl函数调用前调用一次
-        - 调用JointControl函数，该函数需要在任务中循环调用以实现增量控制
+        - 以上的代码只需要在jointControl函数调用前调用一次
+        - 调用jointControl函数，该函数需要在任务中循环调用以实现增量控制
         - 在构造函数中可以设置是否跟随真实时间，跟随真实时间时，请设置目标函数执行的周期为10ms，轨迹点时间间隔
           不低于0.1s，此时轨迹点时间单位为秒。任一条件不满足将自动不跟随真实时间。
+        - 在执行过程中，可以通过jointControl函数的返回值读取轨迹点执行状态，在轨迹点执行过程中，可以调用abort函数终止轨迹执行。
     @warning
       -# 
       -# 
